@@ -2,23 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/infrastructure/http/server.ts",
+      "src": "src/infrastructure/adapters/http/server.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "src/infrastructure/http/server.ts"
+      "dest": "src/infrastructure/adapters/http/server.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "src/infrastructure/http/server.ts"
+      "dest": "src/infrastructure/adapters/http/server.ts"
     }
-  ],
-  "env": {
-    "SUPABASE_URL": "@supabase_url",
-    "SUPABASE_ANON_KEY": "@supabase_anon_key",
-    "JWT_SECRET": "@jwt_secret"
-  }
+  ]
 }
