@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 const specs = JSON.parse(
-  fs.readFileSync(path.resolve(process.cwd(), 'openapi.json'), 'utf8')
+  fs.readFileSync(path.resolve(__dirname, '../../../openapi.json'), 'utf8')
 );
 
 specs.servers = [
