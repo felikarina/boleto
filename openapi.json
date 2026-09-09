@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Boleto",
+    "version": "1.0.0",
+    "description": "API de gestion des tickets de support"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Serveur local"
+    }
+  ],
+  "tags": [
+    { "name": "Auth", "description": "Authentification" },
+    { "name": "Tickets", "description": "Gestion des tickets" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "SignupDTO": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string", "example": "Client Test" },
+          "email": { "type": "string", "format": "email", "example": "client@example.com" },
+          "password": { "type": "string", "example": "password123" },
+          "role": { "type": "string", "enum": ["CLIENT", "AGENT", "ADMIN"] }
+        }
+      },
+      "LoginDTO": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" }
+        }
+      },
+      "UserResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["CLIENT", "AGENT", "ADMIN"] },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateTicketDTO": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "UpdateTicketDTO": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string", "enum": ["Ouvert", "En cours", "Terminé"] },
+          "agent_id": { "type": "string", "format": "uuid", "nullable": true }
+        }
+      },
+      "TicketResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "type": "string" },
+          "client_id": { "type": "string", "format": "uuid" },
+          "agent_id": { "type": "string", "format": "uuid", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Vérifier la disponibilité de l'API",
+        "tags": ["Auth"],
+        "responses": { "200": { "description": "API disponible" } }
+      }
+    },
+    "/api/auth/signup": {
+      "post": {
+        "summary": "Inscrire un nouvel utilisateur",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignupDTO" } } }
+        },
+        "responses": {
+          "201": { "description": "Utilisateur créé", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserResponseDTO" } } } },
+          "400": { "description": "Erreur de validation" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Connecter un utilisateur",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginDTO" } } }
+        },
+        "responses": { "200": { "description": "Connexion réussie" }, "401": { "description": "Identifiants invalides" } }
+      }
+    },
+    "/api/tickets": {
+      "get": {
+        "summary": "Lister les tickets",
+        "tags": ["Tickets"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "in": "query", "name": "status", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Liste des tickets" }, "401": { "description": "Non autorisé" } }
+      },
+      "post": {
+        "summary": "Créer un ticket",
+        "tags": ["Tickets"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTicketDTO" } } }
+        },
+        "responses": { "201": { "description": "Ticket créé" }, "401": { "description": "Non autorisé" } }
+      }
+    },
+    "/api/tickets/{id}": {
+      "parameters": [{ "in": "path", "name": "id", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+      "get": { "summary": "Récupérer un ticket", "tags": ["Tickets"], "security": [{ "bearerAuth": [] }], "responses": { "200": { "description": "Ticket trouvé" }, "404": { "description": "Ticket introuvable" } } },
+      "patch": {
+        "summary": "Mettre à jour un ticket",
+        "tags": ["Tickets"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateTicketDTO" } } } },
+        "responses": { "200": { "description": "Ticket mis à jour" }, "404": { "description": "Ticket introuvable" } }
+      },
+      "delete": { "summary": "Supprimer un ticket", "tags": ["Tickets"], "security": [{ "bearerAuth": [] }], "responses": { "204": { "description": "Ticket supprimé" }, "404": { "description": "Ticket introuvable" } } }
+    }
+  }
+}

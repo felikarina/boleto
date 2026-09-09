@@ -1,19 +1,15 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "src/infrastructure/adapters/http/server.ts",
-      "use": "@vercel/node"
+  "buildCommand": "npm run build",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": ["dist/**/*.js", "openapi.json"]
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "src/infrastructure/adapters/http/server.ts"
-    },
-    {
       "src": "/(.*)",
-      "dest": "src/infrastructure/adapters/http/server.ts"
+      "dest": "api/index.js"
     }
   ]
 }
