@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import serverless from 'serverless-http';
 import { setupSwagger } from '../../utils/swagger';
 import ticketRouter from './routes/ticketRoutes';
 import authRouter from './routes/authRoutes';
@@ -14,6 +13,10 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'boleto' });
+});
 
 // Routes
 app.use('/api/tickets', ticketRouter);
@@ -29,9 +32,8 @@ setupSwagger(app);
 app.use(errorHandler);
 
 // Export pour Vercel
-const handler = serverless(app);
-export { handler };
-export default handler;
+export { app };
+export default app;
 
 // Démarrer le serveur localement
 const PORT = process.env.PORT || 3000;
