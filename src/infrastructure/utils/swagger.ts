@@ -12,8 +12,10 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Serveur local',
+        url: process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'http://localhost:3000',
+        description: process.env.VERCEL_URL ? 'Serveur déployé' : 'Serveur local',
       },
     ],
     components: {
@@ -94,7 +96,7 @@ const options = {
       },
     },
   },
-  apis: ['./src/infrastructure/http/routes/*.ts'],
+  apis: ['./src/infrastructure/adapters/http/routes/*.ts'],
 };
 
 const specs = swaggerJsdoc(options);
