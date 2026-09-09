@@ -29,7 +29,9 @@ setupSwagger(app);
 app.use(errorHandler);
 
 // Export pour Vercel
-export const handler = serverless(app);
+const handler = serverless(app);
+export { handler };
+export default handler;
 
 // Démarrer le serveur localement
 const PORT = process.env.PORT || 3000;
