@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "functions": {
     "api/index.js": {
-      "includeFiles": ["dist/**/*.js", "openapi.json"]
+      "includeFiles": "{dist/**/*.js,openapi.json}"
     }
   },
   "routes": [
