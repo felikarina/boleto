@@ -1,6 +1,12 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
+import path from 'path';
+
+const routePatterns = [
+  path.join(process.cwd(), 'src/infrastructure/adapters/http/routes/*.ts'),
+  path.join(__dirname, '../adapters/http/routes/*.js'),
+].map((routePattern) => routePattern.replace(/\\/g, '/'));
 
 const options = {
   definition: {
@@ -96,7 +102,7 @@ const options = {
       },
     },
   },
-  apis: ['./src/infrastructure/adapters/http/routes/*.ts'],
+  apis: routePatterns,
 };
 
 const specs = swaggerJsdoc(options);

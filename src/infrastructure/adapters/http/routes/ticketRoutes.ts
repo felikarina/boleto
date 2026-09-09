@@ -68,7 +68,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res, next) => {
  *         name: status
  *         schema:
  *           type: string
- *           enum: [Open, In Progress, Resolved, Closed]
+ *           enum: [Ouvert, En cours, Termine]
  *         description: Filtrer par statut
  *     responses:
  *       200:
