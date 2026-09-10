@@ -19,9 +19,9 @@ export class UpdateTicket {
     }
 
     // Vérifier les permissions
-    const isAssigned = ticket.agent_id === userId;
+    const isAssignedToAnotherAgent = ticket.agent_id !== null && ticket.agent_id !== userId;
 
-    if (userRole !== 'AGENT' || !isAssigned) {
+    if (userRole !== 'AGENT' || isAssignedToAnotherAgent) {
       throw new UnauthorizedError("Seul l'agent assigné peut modifier ce ticket.");
     }
 
@@ -30,13 +30,9 @@ export class UpdateTicket {
       throw new Error('Invalid status.');
     }
 
-    // L'agent assigné ne peut pas réassigner le ticket lui-même.
-    if (updates.agent_id) {
-      delete updates.agent_id;
-    }
-
     const updatedTicket = await this.ticketRepository.update(ticketId, {
       ...updates,
+      agent_id: ticket.agent_id ?? userId,
       updatedAt: new Date(),
     });
 
