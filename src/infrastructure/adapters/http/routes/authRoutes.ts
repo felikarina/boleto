@@ -3,8 +3,14 @@ import { authService } from '../../../config/container';
 import { supabase, supabaseAuth } from '../../../config/supabase';
 import { SignupDTO, LoginDTO } from '../../../../application/dataTransferObjects/UserDTO';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+const loginLimiter = rateLimit({
+  windowMs: 1000,
+  max: 1,
+  message: 'Trop de tentatives de connexion, veuillez réessayer plus tard.'
+});
 
 /**
  * @swagger
@@ -68,7 +74,7 @@ router.post('/signup', async (req, res, next) => {
  *       500:
  *         description: Erreur serveur
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body as LoginDTO;
 

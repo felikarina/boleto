@@ -6,15 +6,22 @@ import ticketRouter from './routes/ticketRoutes';
 import authRouter from './routes/authRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
+const globalLimiter = rateLimit({
+  windowMs: 1000,
+  max: 10,
+  message: 'Trop de requêtes, veuillez réessayer plus tard.'
+});
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(helmet())
+app.use(globalLimiter);
 
 app.get('/', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'boleto' });
