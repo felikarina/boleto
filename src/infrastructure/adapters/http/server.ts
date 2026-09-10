@@ -5,6 +5,7 @@ import { setupSwagger } from '../../utils/swagger';
 import ticketRouter from './routes/ticketRoutes';
 import authRouter from './routes/authRoutes';
 import { errorHandler } from './middlewares/errorHandler';
+import helmet from 'helmet';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(helmet())
 
 app.get('/', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'boleto' });
