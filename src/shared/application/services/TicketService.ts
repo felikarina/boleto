@@ -1,15 +1,15 @@
-import { TicketRepository } from '../../domain/repositories/TicketRepository';
-import { CreateTicket } from '../../domain/usecases/CreateTicket';
-import { GetTickets } from '../../domain/usecases/GetTicket';
-import { UpdateTicket } from '../../domain/usecases/UpdateTicket';
-import { DeleteTicket } from '../../domain/usecases/DeleteTicket';
+import { TicketRepository } from '../../../shared/domain/repositories/TicketRepository';
+import { CreateTicket } from '../../../shared/domain/usecases/CreateTicket';
+import { GetTickets } from '../../../shared/domain/usecases/GetTicket';
+import { UpdateTicket } from '../../../shared/domain/usecases/UpdateTicket';
+import { DeleteTicket } from '../../../shared/domain/usecases/DeleteTicket';
 import {
   CreateTicketDTO,
   UpdateTicketDTO,
   TicketResponseDTO,
-} from '../dataTransferObjects/TicketDTO';
-import { UserRole } from '../../domain/entities/User';
-import { NotFoundError } from '../../domain/errors/NotFoundError';
+} from '../../../shared/application/dto/TicketDTO';
+import { UserRole } from '../../../shared/domain/entities/User';
+import { NotFoundError } from '../../../shared/domain/errors/NotFoundError';
 
 export class TicketService {
   private ticketRepository: TicketRepository;

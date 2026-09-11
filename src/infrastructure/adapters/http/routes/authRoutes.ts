@@ -1,15 +1,29 @@
 import { Router } from 'express';
 import { authService } from '../../../config/container';
 import { supabase, supabaseAuth } from '../../../config/supabase';
-import { SignupDTO, LoginDTO } from '../../../../application/dataTransferObjects/UserDTO';
+import { SignupDTO, LoginDTO } from '../../../../shared/application/dto/UserDTO';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
+import { authenticate } from '../middlewares/authMiddleware';
 
 const router = Router();
 const loginLimiter = rateLimit({
   windowMs: 1000,
   max: 1,
   message: 'Trop de tentatives de connexion, veuillez réessayer plus tard.'
+});
+
+router.get('/me', authenticate, async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Utilisateur non authentifié.' });
+    }
+
+    const user = await authService.getUserById(req.user.id);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
 });
 
 /**
@@ -38,6 +52,11 @@ const loginLimiter = rateLimit({
  */
 router.post('/signup', async (req, res, next) => {
   try {
+    const { name, email, password } = req.body as Partial<SignupDTO>;
+    if (!name?.trim() || !email?.trim() || !password) {
+      return res.status(400).json({ error: 'Nom, email et mot de passe sont requis.' });
+    }
+
     const user = await authService.signup(req.body as SignupDTO);
     res.status(201).json(user);
   } catch (error) {

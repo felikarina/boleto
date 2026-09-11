@@ -7,6 +7,7 @@ import authRouter from './routes/authRoutes';
 import { errorHandler } from './middlewares/errorHandler';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 dotenv.config();
 
@@ -23,8 +24,13 @@ app.use(express.json());
 app.use(helmet())
 app.use(globalLimiter);
 
-app.get('/', (req, res) => {
-  res.status(200).json({ status: 'OK', service: 'boleto' });
+const frontendPublicPath = path.resolve(__dirname, '../../../../src/frontend/public');
+const frontendBuildPath = path.resolve(__dirname, '../../../../dist/frontend');
+app.use(express.static(frontendPublicPath));
+app.use(express.static(frontendBuildPath));
+
+app.get(['/login', '/signup', '/tickets'], (req, res) => {
+  res.sendFile(path.join(frontendPublicPath, 'index.html'));
 });
 
 // Routes

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { UserRole } from '../../../../domain/entities/User';
+import { UserRole } from '../../../../shared/domain/entities/User';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET!;

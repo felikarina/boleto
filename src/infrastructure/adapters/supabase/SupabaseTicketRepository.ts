@@ -1,5 +1,5 @@
-import { TicketRepository } from '../../../domain/repositories/TicketRepository';
-import { Ticket, TicketStatus } from '../../../domain/entities/Ticket';
+import { TicketRepository } from '../../../shared/domain/repositories/TicketRepository';
+import { Ticket, TicketStatus } from '../../../shared/domain/entities/Ticket';
 import { supabase } from '../../config/supabase';
 
 export class SupabaseTicketRepository implements TicketRepository {
@@ -61,7 +61,7 @@ export class SupabaseTicketRepository implements TicketRepository {
     if (role === 'CLIENT') {
       query = query.eq('client_id', userId);
     } else if (role === 'AGENT') {
-      query = query.or(`client_id.eq.${userId},agent_id.eq.${userId}`);
+      query = query.or(`agent_id.is.null,agent_id.eq.${userId}`);
     }
     // Les ADMIN voient tous les tickets
 
