@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { NotFoundError } from '../../../../domain/errors/NotFoundError';
-import { UnauthorizedError } from '../../../../domain/errors/UnauthorizedError';
+import { NotFoundError } from '../../../../shared/domain/errors/NotFoundError';
+import { UnauthorizedError } from '../../../../shared/domain/errors/UnauthorizedError';
+import { ConflictError } from '../../../../shared/domain/errors/ConflictError';
 
 export const errorHandler = (
   error: Error,
@@ -14,6 +15,10 @@ export const errorHandler = (
 
   if (error instanceof UnauthorizedError) {
     return res.status(403).json({ error: error.message });
+  }
+
+  if (error instanceof ConflictError) {
+    return res.status(409).json({ error: error.message });
   }
 
   console.error('Unhandled error:', error);

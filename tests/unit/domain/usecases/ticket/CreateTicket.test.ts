@@ -1,6 +1,6 @@
-import { CreateTicket } from '../../../../../src/domain/usecases/CreateTicket';
-import { TicketRepository } from '../../../../../src/domain/repositories/TicketRepository';
-import { Ticket } from '../../../../../src/domain/entities/Ticket';
+import { CreateTicket } from '../../../../../src/shared/domain/usecases/CreateTicket';
+import { TicketRepository } from '../../../../../src/shared/domain/repositories/TicketRepository';
+import { Ticket } from '../../../../../src/shared/domain/entities/Ticket';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 const mockTicketRepository: jest.Mocked<TicketRepository> = {

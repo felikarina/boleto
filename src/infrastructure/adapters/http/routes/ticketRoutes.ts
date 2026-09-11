@@ -1,8 +1,8 @@
 import { Request, Router } from 'express';
 import { ticketService } from '../../../config/container';
 import { authenticate, authorize } from '../middlewares/authMiddleware';
-import { CreateTicketDTO, UpdateTicketDTO } from '../../../../application/dataTransferObjects/TicketDTO';
-import { UserRole } from '../../../../domain/entities/User';
+import { CreateTicketDTO, UpdateTicketDTO } from '../../../../shared/application/dto/TicketDTO';
+import { UserRole } from '../../../../shared/domain/entities/User';
 
 const router = Router();
 

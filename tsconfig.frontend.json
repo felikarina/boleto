@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "outDir": "./dist/frontend",
+    "rootDir": "./src",
+    "noEmit": false
+  },
+  "include": ["src/frontend/**/*", "src/shared/**/*"],
+  "exclude": ["node_modules"]
+}

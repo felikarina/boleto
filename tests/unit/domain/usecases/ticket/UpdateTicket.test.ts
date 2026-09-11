@@ -1,8 +1,8 @@
-import { UpdateTicket } from '../../../../../src/domain/usecases/UpdateTicket';
-import { TicketRepository } from '../../../../../src/domain/repositories/TicketRepository';
-import { Ticket } from '../../../../../src/domain/entities/Ticket';
-import { NotFoundError } from '../../../../../src/domain/errors/NotFoundError';
-import { UnauthorizedError } from '../../../../../src/domain/errors/UnauthorizedError';
+import { UpdateTicket } from '../../../../../src/shared/domain/usecases/UpdateTicket';
+import { TicketRepository } from '../../../../../src/shared/domain/repositories/TicketRepository';
+import { Ticket } from '../../../../../src/shared/domain/entities/Ticket';
+import { NotFoundError } from '../../../../../src/shared/domain/errors/NotFoundError';
+import { UnauthorizedError } from '../../../../../src/shared/domain/errors/UnauthorizedError';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 

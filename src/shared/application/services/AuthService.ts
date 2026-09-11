@@ -1,8 +1,8 @@
-import { UserRepository } from '../../domain/repositories/UserRepository';
-import { Signup } from '../../domain/usecases/auth/Signup';
-import { Login } from '../../domain/usecases/auth/Login';
-import { GetUserById } from '../../domain/usecases/auth/GetUserById';
-import { SignupDTO, LoginDTO, UserResponseDTO } from '../dataTransferObjects/UserDTO';
+import { UserRepository } from '../../../shared/domain/repositories/UserRepository';
+import { Signup } from '../../../shared/domain/usecases/auth/Signup';
+import { Login } from '../../../shared/domain/usecases/auth/Login';
+import { GetUserById } from '../../../shared/domain/usecases/auth/GetUserById';
+import { SignupDTO, LoginDTO, UserResponseDTO } from '../../../shared/application/dto/UserDTO';
 
 export class AuthService {
   private signupUseCase: Signup;
@@ -16,7 +16,7 @@ export class AuthService {
   }
 
   async signup(dto: SignupDTO): Promise<UserResponseDTO> {
-    const user = await this.signupUseCase.execute(dto.name, dto.email, dto.password, dto.role);
+    const user = await this.signupUseCase.execute(dto.name, dto.email, dto.password, 'CLIENT');
     return this.toDTO(user);
   }
 

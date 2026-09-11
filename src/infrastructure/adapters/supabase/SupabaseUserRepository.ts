@@ -1,7 +1,8 @@
-import { UserRepository } from '../../../domain/repositories/UserRepository';
-import { User, UserRole } from '../../../domain/entities/User';
+import { UserRepository } from '../../../shared/domain/repositories/UserRepository';
+import { User, UserRole } from '../../../shared/domain/entities/User';
 import { supabase } from '../../config/supabase';
 import bcrypt from 'bcryptjs';
+import { ConflictError } from '../../../shared/domain/errors/ConflictError';
 
 export class SupabaseUserRepository implements UserRepository {
   async create(nom: string, email: string, password: string, role: UserRole): Promise<User> {
@@ -13,6 +14,9 @@ export class SupabaseUserRepository implements UserRepository {
     });
 
     if (authError) {
+      if (authError.message.includes('already been registered')) {
+        throw new ConflictError('Cette adresse email est déjà utilisée.');
+      }
       throw new Error(`Error creating user: ${authError.message}`);
     }
 
@@ -32,6 +36,7 @@ export class SupabaseUserRepository implements UserRepository {
       .single();
 
     if (profileError) {
+      await supabase.auth.admin.deleteUser(authUser.user.id);
       throw new Error(`Error creating profile: ${profileError.message}`);
     }
 
