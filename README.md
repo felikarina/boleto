@@ -1,212 +1,274 @@
 # 🚀 Boleto
 
-Application de gestion des demandes de support permettant aux clients de créer des tickets, aux agents de les traiter et aux administrateurs de gérer les utilisateurs.
+Boleto est une application de gestion de tickets de support, pensée pour séparer clairement le cœur métier de l’infrastructure technique. Le backend suit une architecture hexagonale : le domaine et les cas d’usage sont indépendants d’Express, de Supabase et des détails de transport.
 
-Le backend est organisé selon une architecture hexagonale (aussi appelée architecture ports et adaptateurs). Le domaine et les cas d’usage restent indépendants d'Express, de Supabase et des détails de transport.
+Le projet expose une API REST sécurisée, gère l’authentification JWT et s’appuie sur Supabase pour la persistance et l’authentification utilisateur.
 
-## 📋 Contenu rapide
+## ✨ Fonctionnalités
 
-* Domaine : entités, règles métier, erreurs et ports de persistance.
-* Application : cas d’usage, services d’orchestration et DTO.
-* Infrastructure : API HTTP Express, authentification JWT, Supabase et composition des dépendances.
-* Documentation : spécification OpenAPI disponible via Swagger UI.
+- Inscription et connexion d’utilisateurs
+- Authentification via JWT
+- Création, consultation, mise à jour et suppression de tickets
+- Rôles : CLIENT, AGENT, ADMIN
+- Contrôle d’accès selon le rôle
+- API documentée avec Swagger UI
+- Frontend statique servi par le serveur Express
+- Déploiement compatible Vercel
+
+## 🏗️ Stack technique
+
+- Node.js / TypeScript
+- Express
+- Supabase JavaScript client
+- JWT (jsonwebtoken)
+- PostgreSQL via Supabase
+- Swagger/OpenAPI
+- Jest pour les tests unitaires
+- Vercel-ready
+
+## 📁 Structure du projet
+
+```text
+boleto/
+├── api/
+│   └── index.js                 # Point d’entrée Vercel
+├── src/
+│   ├── frontend/
+│   │   ├── public/
+│   │   │   └── index.html       # Frontend statique
+│   │   └── src/
+│   │       └── main.ts          # Logiciel frontend
+│   ├── infrastructure/
+│   │   ├── adapters/
+│   │   │   ├── http/
+│   │   │   │   ├── middlewares/
+│   │   │   │   ├── routes/
+│   │   │   │   └── server.ts
+│   │   │   └── supabase/
+│   │   ├── config/
+│   │   │   ├── container.ts
+│   │   │   ├── supabase.ts
+│   │   │   └── ...
+│   │   └── utils/
+│   │       └── swagger.ts
+│   └── shared/
+│       ├── application/
+│       │   ├── dto/
+│       │   └── services/
+│       ├── domain/
+│       │   ├── entities/
+│       │   ├── errors/
+│       │   ├── repositories/
+│       │   └── usecases/
+│       └── ...
+├── tests/
+│   └── unit/
+│       └── domain/
+│           └── usecases/
+│               └── ticket/
+├── openapi.json                 # Spécification OpenAPI
+├── package.json
+├── tsconfig.json
+├── tsconfig.frontend.json
+├── vercel.json
+├── README.md
+└── ...
+```
+
+## 🧭 Architecture
+
+### Couche domaine
+
+Contient les règles métier, les entités et les ports :
+
+- `User`
+- `Ticket`
+- `UserRole`
+- `TicketStatus`
+- repositories (`UserRepository`, `TicketRepository`)
+- use cases (`Signup`, `Login`, `CreateTicket`, `UpdateTicket`, etc.)
+
+### Couche application
+
+La couche applicative orchestre les cas d’usage et transforme les entités en DTO :
+
+- `AuthService`
+- `TicketService`
+- DTO des utilisateurs et des tickets
+
+### Couche infrastructure
+
+Implémente les adaptateurs externes :
+
+- `Express` pour les routes HTTP
+- `Supabase` pour les repositories et l’authentification
+- Swagger pour la documentation OpenAPI
+- injection de dépendances via `container.ts`
 
 ## ⚙️ Prérequis
 
-* Git
-* Node.js (recommandé : Node 22)
-* npm (fourni avec Node)
-* Un compte Supabase
-* Un compte Vercel si l'API doit être déployée sur cette plateforme
+- Git
+- Node.js 20+ ou 22 recommandé
+- npm
+- Compte Supabase actif
+- Optionnel : compte Vercel pour le déploiement
 
-## 📥 Cloner le dépôt
+## 📦 Installation
 
 ```bash
 git clone https://github.com/felikarina/boleto.git
 cd boleto
-```
-
-## 📦 Installer les dépendances
-
-Installez les dépendances à la racine du repo :
-
-```bash
 npm install
 ```
 
-## 🔧 Configuration des variables d'environnement
+## 🔐 Variables d’environnement
 
-L'API utilise Supabase pour l'authentification et la persistance PostgreSQL. Créez un fichier `.env.local` à la racine du projet :
-
+Créez un fichier `.env` ou `.env.local` à la racine du projet avec les variables suivantes :
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL="votre-url-supabase"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="votre-cle-supabase"
+SUPABASE_URL="https://votre-projet.supabase.co"
+SUPABASE_ANON_KEY="votre-cle-anon-supabase"
 JWT_SECRET="votre-secret-jwt"
 PORT=3000
 ```
 
-Les valeurs sont disponibles dans les paramètres du projet Supabase.
+### Détails
 
-Pour le déploiement sur Vercel, ces variables doivent également être ajoutées dans les variables d'environnement du projet.
+- `SUPABASE_URL` : URL du projet Supabase
+- `SUPABASE_ANON_KEY` : clé publique de votre projet Supabase
+- `JWT_SECRET` : clé utilisée pour signer et vérifier les tokens JWT
+- `PORT` : port local du serveur Express
 
-⚠️ Ne commitez jamais votre fichier `.env.local` dans le repository.
+> Ne commitez jamais les fichiers `.env` ou `.env.local`.
 
 ## ▶️ Lancer le projet en local
 
-Le projet utilise Supabase pour la base de données et l'authentification.
-
-En mode développement, le serveur est relancé automatiquement lorsque les fichiers TypeScript de `src/` changent :
+### Mode développement
 
 ```bash
 npm run dev
 ```
-L'application sera accessible à l'adresse :
+
+Le serveur démarre sur :
 
 ```text
 http://localhost:3000
 ```
 
-La documentation interactive est disponible à l'adresse `http://localhost:3000/api-docs`.
+La documentation Swagger est accessible ici :
 
-Pour compiler puis lancer la version JavaScript :
+```text
+http://localhost:3000/api-docs
+```
+
+Le frontend static est servi sur :
+
+- `/login`
+- `/signup`
+- `/tickets`
+
+### Build de production
 
 ```bash
 npm run build
 npm start
 ```
 
-## 🧭 Architecture hexagonale
+## 🔌 API REST
 
-Le code est structuré autour d'un domaine indépendant des frameworks et des services externes :
+### Authentification
 
-```text
-src/
-├── domain/
-│   ├── entities/       # Ticket, User et types métier
-│   ├── errors/         # Erreurs métier
-│   ├── repositories/   # Ports sortants de persistance
-│   └── usecases/       # Règles et cas d'usage métier
-├── application/
-│   ├── dataTransferObjects/ # Contrats d'entrée et de sortie
-│   └── services/            # Orchestration des cas d'usage
-└── infrastructure/
-	├── adapters/http/       # Adaptateur entrant Express, routes et middlewares
-	├── adapters/supabase/   # Adaptateurs sortants de persistance
-	├── config/              # Configuration et injection des dépendances
-	└── utils/               # Swagger/OpenAPI
+- `POST /api/auth/signup` : créer un utilisateur
+- `POST /api/auth/login` : se connecter et obtenir un JWT
+- `GET /api/auth/me` : récupérer l’utilisateur connecté (authentification requise)
+
+### Tickets
+
+Les routes tickets sont protégées par le middleware d’authentification et nécessitent un header :
+
+```http
+Authorization: Bearer <token>
 ```
 
-### Flux de dépendances
+- `POST /api/tickets` : créer un ticket
+- `GET /api/tickets` : lister les tickets accessibles selon le rôle
+- `GET /api/tickets/:id` : récupérer un ticket
+- `PATCH /api/tickets/:id` : mettre à jour un ticket
+- `DELETE /api/tickets/:id` : supprimer un ticket
 
-* Le **domaine** définit les entités (`Ticket`, `User`), les statuts, les erreurs, les interfaces `TicketRepository` et `UserRepository`, ainsi que les cas d'usage.
-* La couche **application** reçoit les DTO, invoque les cas d'usage et transforme les entités en réponses API via `TicketService` et `AuthService`.
-* L'**infrastructure** implémente les ports avec `SupabaseTicketRepository` et `SupabaseUserRepository`, expose les routes Express et configure les dépendances dans `container.ts`.
-* Les adaptateurs HTTP dépendent des services applicatifs, tandis que le domaine ne dépend d'aucun adaptateur. Un nouvel adaptateur de persistance peut donc remplacer Supabase sans modifier les règles métier.
+### Santé
 
-## 🗄️ Bases de données / Migrations
-
-La base de données PostgreSQL est hébergée sur Supabase.
-
-Le projet contient deux entités principales :
-
-* `UTILISATEUR`
-* `TICKET`
-
-Les utilisateurs possèdent un rôle :
-
-* `ADMIN`
-* `CLIENT`
-* `AGENT`
-
-Les tickets possèdent un statut :
-
-* `OUVERT`
-* `EN_COURS`
-* `TERMINE`
-
-Les relations principales sont :
-
-* un client peut créer plusieurs tickets ;
-* un ticket appartient à un seul client ;
-* un agent peut traiter plusieurs tickets ;
-* un ticket peut être traité par zéro ou un agent.
-
-Les clés étrangères permettent de relier les tickets aux utilisateurs.
-
-Exemple :
-
-```text
-TICKET.client_id → UTILISATEUR.id
-TICKET.agent_id  → UTILISATEUR.id
-```
-
-Les adaptateurs Supabase utilisent les tables `utilisateurs` et `tickets`. Si le schéma de la base de données est modifié, une migration doit être créée puis appliquée afin de conserver un historique des modifications.
-
-## 🔌 API HTTP
-
-Routes d'authentification :
-
-* `POST /api/auth/signup` : créer un utilisateur.
-* `POST /api/auth/login` : se connecter et obtenir un JWT.
-
-Routes de tickets, protégées par `Authorization: Bearer <token>` :
-
-* `POST /api/tickets` : créer un ticket.
-* `GET /api/tickets` : lister les tickets accessibles selon le rôle.
-* `GET /api/tickets/:id` : consulter un ticket.
-* `PATCH /api/tickets/:id` : modifier un ticket selon les droits du rôle.
-* `DELETE /api/tickets/:id` : supprimer un ticket selon les droits du rôle.
-
-Routes de supervision :
-
-* `GET /api/health` : vérifier que l'API répond.
-* `GET /api/health/supabase` : vérifier l'accès à Supabase.
+- `GET /api/health` : vérifie que l’API répond
 
 ## 🧪 Tests
 
-Les tests permettent notamment de vérifier les règles métier et les droits d'accès de chaque utilisateur.
+Le projet contient des tests unitaires sur les cas d’usage métier, notamment :
 
-Les principaux cas testés sont :
+- création de tickets
+- mise à jour de tickets
+- règles de validation métier
+- permissions selon le rôle utilisateur
 
-* authentification d'un utilisateur ;
-* création et consultation des tickets ;
-* traitement d'un ticket par un agent ;
-* passage d'un ticket à `TERMINE` ;
-* contrôle des droits selon le rôle.
-
-Pour lancer les tests :
+Lancer les tests :
 
 ```bash
 npm run test
 ```
-Pour lancer les tests en mode watch :
+
+Mode watch :
 
 ```bash
 npm run test:watch
 ```
 
+## ☁️ Déploiement Vercel
+
+Le projet est prêt pour Vercel via la configuration de `vercel.json` et le point d’entrée `api/index.js`.
+
+Les variables d’environnement Supabase et JWT doivent être ajoutées dans le dashboard Vercel.
+
+```bash
+npm run vercel-build
+```
+
+## 🛠️ Scripts disponibles
+
+Dans `package.json` :
+
+- `npm run dev` : démarrage local avec compilation TypeScript en watch
+- `npm run build` : compile le backend TypeScript et le frontend
+- `npm run build:frontend` : bundle le frontend avec esbuild
+- `npm start` : démarre le serveur compilé
+- `npm test` : exécute la suite Jest
+- `npm run test:watch` : lance Jest en mode watch
+- `npm run vercel-build` : build utilisé pour Vercel
+
 ## ⚠️ Dépannage rapide
 
-* Erreur de connexion à Supabase : vérifiez les valeurs de `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Erreur Supabase : vérifier `SUPABASE_URL`, `SUPABASE_ANON_KEY` et `SUPABASE_SERVICE_ROLE_KEY`
+- Erreur JWT : vérifier la présence de `JWT_SECRET` et sa cohérence
+- Erreur 401 : vérifier le header `Authorization: Bearer <token>`
+- Erreur 403 : vérifier le rôle de l’utilisateur par rapport aux permissions
+- Erreur de build : vérifier la version de Node et relancer `npm install`
 
-* Erreur de JWT : vérifiez que `JWT_SECRET` est défini et identique entre la création et la vérification des tokens.
+## 📌 Rôles métier
 
-* Erreur de variables d'environnement : vérifiez que le fichier `.env.local` existe à la racine du projet et que les noms des variables sont corrects.
+Les rôles disponibles côté application sont :
 
-* Erreur de connexion à la base de données : vérifiez que le projet Supabase est bien actif et accessible.
+- `CLIENT`
+- `AGENT`
+- `ADMIN`
 
-* Erreur avec Node.js : utilisez la version de Node.js recommandée par le projet.
+Les statuts de ticket sont :
 
-* Erreur lors du build : lancez `npm run lint` afin d'identifier les éventuelles erreurs dans le code.
+- `OUVERT`
+- `EN_COURS`
+- `TERMINE`
 
-## 🗂️ Structure importante du repo
+## 🔎 À retenir
 
-* `src/domain/` : coeur métier et ports ;
-* `src/application/` : services et DTO ;
-* `src/infrastructure/` : adaptateurs, configuration et serveur HTTP ;
-* `tests/` : tests du projet ;
-* `.env.local` : variables d'environnement locales ;
-* `package.json` : dépendances et scripts ;
-* `tsconfig.json` : configuration TypeScript ;
-* `README.md` : documentation du projet.
+Boleto est un exemple d’architecture hexagonale appliquée à une API de support : le code métier reste autonome, les adaptateurs externes sont encapsulés et l’API HTTP ne dépend que des services applicatifs, jamais directement du détail technique de la persistance.
+
+---
+
+Pour toute contribution, il suffit de créer une branche, appliquer les changements et lancer les tests avant ouverture d’une PR.
